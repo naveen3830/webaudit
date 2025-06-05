@@ -1,0 +1,12 @@
+crawl4ai>=0.6.3
+fastapi>=0.115.12
+lxml>=5.4.0
+nest-asyncio>=1.6.0
+numpy>=2.2.5
+pandas>=2.2.3
+requests>=2.32.3
+streamlit>=1.45.0
+uvicorn>=0.34.2
+extruct>=0.18.0
+pathlib>=1.0.1
+python-multipart>=0.0.20
