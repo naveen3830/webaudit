@@ -91,7 +91,6 @@ URL_VARIATIONS = [
     "/register",
 ]
 
-# Pydantic models for request/response
 class FileUploadResponse(BaseModel):
     message: str
     rows: int
@@ -574,48 +573,6 @@ def analyze_screaming_frog_data(df, alt_tag_df=None, orphan_pages_df=None):
 @app.get("/")
 async def root():
     return {"message": "Web Audit Data Analyzer API", "version": "1.0.0"}
-
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy"}
-
-@app.get("/validate-default-files")
-async def validate_default_files() -> FileValidationResponse:
-    """Check if default files exist at their expected paths"""
-    missing_files = []
-    
-    if not os.path.exists(DATA_FILE_PATH):
-        missing_files.append(f"Main data file: {DATA_FILE_PATH}")
-    if not os.path.exists(ALT_TAG_DATA_PATH):
-        missing_files.append(f"Alt tag data file: {ALT_TAG_DATA_PATH}")
-    if not os.path.exists(ORPHAN_PAGES_DATA_PATH):
-        missing_files.append(f"Orphan pages data file: {ORPHAN_PAGES_DATA_PATH}")
-    
-    return FileValidationResponse(
-        files_exist=len(missing_files) == 0,
-        missing_files=missing_files
-    )
-
-@app.post("/upload-file")
-async def upload_single_file(
-    file: UploadFile = File(...),
-    file_type: str = Form(...)
-) -> FileUploadResponse:
-    """Upload and validate a single CSV file"""
-    if not file.filename.endswith('.csv'):
-        raise HTTPException(status_code=400, detail="Only CSV files are allowed")
-    
-    try:
-        contents = await file.read()
-        df = pd.read_csv(io.StringIO(contents.decode('utf-8')))
-        
-        return FileUploadResponse(
-            message=f"{file_type} file uploaded successfully",
-            rows=len(df),
-            columns=list(df.columns)
-        )
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Error processing file: {str(e)}")
 
 @app.post("/analyze-uploaded-data")
 async def analyze_uploaded_data(
